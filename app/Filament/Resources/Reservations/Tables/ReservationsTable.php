@@ -10,6 +10,7 @@ use App\Models\Reservation;
 use App\Services\Reservations\AvailabilityBlockService;
 use App\Support\BookingTime;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -108,6 +109,12 @@ class ReservationsTable
                 ActionGroup::make([
                     ReservationActions::moveToTable(),
                     ReservationActions::cancel(),
+                    ReservationActions::delete(),
+                ]),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    ReservationActions::deleteSelected(),
                 ]),
             ]);
     }

@@ -6,7 +6,7 @@ use App\Models\Reservation;
 use App\Models\User;
 
 /**
- * Reservations are never deleted: they can only be cancelled, to keep the history.
+ * Admins can cancel reservations (history kept) or delete them permanently.
  */
 class ReservationPolicy
 {
@@ -42,11 +42,11 @@ class ReservationPolicy
 
     public function delete(User $user, Reservation $reservation): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     public function deleteAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 }

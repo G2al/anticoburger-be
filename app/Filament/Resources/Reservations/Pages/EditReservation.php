@@ -25,6 +25,7 @@ class EditReservation extends EditRecord
             ViewAction::make(),
             ReservationActions::moveToTable(),
             ReservationActions::cancel(),
+            ReservationActions::delete(),
         ];
     }
 

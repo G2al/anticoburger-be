@@ -7,9 +7,12 @@ use App\Models\Reservation;
 use App\Services\Reservations\AvailabilityService;
 use App\Services\Reservations\ReservationService;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Collection;
 
 /**
  * Reservation actions shared by the table, the view page and the edit page.
@@ -31,6 +34,35 @@ final class ReservationActions
                 app(ReservationService::class)->cancel($record);
 
                 Notification::make()->title('Prenotazione annullata')->success()->send();
+            });
+    }
+
+    public static function delete(): DeleteAction
+    {
+        return DeleteAction::make()
+            ->label('Elimina definitivamente')
+            ->modalHeading('Eliminare definitivamente la prenotazione?')
+            ->modalDescription('La prenotazione verrà cancellata per sempre dal database e non sarà più recuperabile. Se vuoi mantenerne lo storico usa invece "Annulla prenotazione".')
+            ->modalSubmitActionLabel('Sì, elimina per sempre')
+            ->successNotificationTitle('Prenotazione eliminata definitivamente')
+            ->using(function (Reservation $record): bool {
+                app(ReservationService::class)->delete($record);
+
+                return true;
+            });
+    }
+
+    public static function deleteSelected(): DeleteBulkAction
+    {
+        return DeleteBulkAction::make()
+            ->label('Elimina definitivamente')
+            ->modalHeading('Eliminare definitivamente le prenotazioni selezionate?')
+            ->modalDescription('Le prenotazioni verranno cancellate per sempre dal database e non saranno più recuperabili.')
+            ->modalSubmitActionLabel('Sì, elimina per sempre')
+            ->using(function (Collection $records): void {
+                $reservations = app(ReservationService::class);
+
+                $records->each(fn (Reservation $record) => $reservations->delete($record));
             });
     }
 

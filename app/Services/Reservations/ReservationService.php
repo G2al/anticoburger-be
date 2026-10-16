@@ -157,6 +157,15 @@ class ReservationService
     }
 
     /**
+     * Permanently removes a reservation (admin only). Cancelling keeps the history;
+     * deleting erases it and frees the table.
+     */
+    public function delete(Reservation $reservation): void
+    {
+        $this->bookingLock->run(fn () => $reservation->delete());
+    }
+
+    /**
      * Finds a reservation by public reference, only when the token matches.
      * Unknown references and wrong tokens are indistinguishable to the caller.
      *

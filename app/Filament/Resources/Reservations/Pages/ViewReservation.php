@@ -17,6 +17,7 @@ class ViewReservation extends ViewRecord
             EditAction::make(),
             ReservationActions::moveToTable(),
             ReservationActions::cancel(),
+            ReservationActions::delete(),
         ];
     }
 }

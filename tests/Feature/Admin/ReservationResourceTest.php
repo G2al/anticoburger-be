@@ -208,12 +208,48 @@ class ReservationResourceTest extends TestCase
         $this->assertSame(ReservationStatus::Cancelled, $reservation->status);
     }
 
-    public function test_reservations_cannot_be_deleted(): void
+    public function test_reservation_can_be_deleted_permanently_and_frees_the_table(): void
     {
         $table = $this->createTable([2]);
         $reservation = Reservation::factory()->on($table, self::WEDNESDAY, '20:00')->create();
 
-        $this->assertFalse(auth()->user()->can('delete', $reservation));
+        Livewire::test(ViewReservation::class, ['record' => $reservation->getRouteKey()])
+            ->callAction('delete')
+            ->assertNotified('Prenotazione eliminata definitivamente');
+
+        $this->assertModelMissing($reservation);
+
+        Livewire::test(CreateReservation::class)
+            ->fillForm($this->formData(['restaurant_table_id' => $table->id]))
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(1, Reservation::query()->count());
+    }
+
+    public function test_selected_reservations_can_be_deleted_in_bulk(): void
+    {
+        $table = $this->createTable([2]);
+        $first = Reservation::factory()->on($table, self::WEDNESDAY, '19:00')->create();
+        $second = Reservation::factory()->on($table, self::WEDNESDAY, '21:00')->cancelled()->create();
+        $kept = Reservation::factory()->on($table, self::THURSDAY, '20:00')->create();
+
+        Livewire::test(ListReservations::class)
+            ->selectTableRecords([$first, $second])
+            ->callAction(TestAction::make('delete')->table()->bulk());
+
+        $this->assertModelMissing($first);
+        $this->assertModelMissing($second);
+        $this->assertModelExists($kept);
+    }
+
+    public function test_non_admins_cannot_delete_reservations(): void
+    {
+        $table = $this->createTable([2]);
+        $reservation = Reservation::factory()->on($table, self::WEDNESDAY, '20:00')->create();
+
+        $this->assertFalse(User::factory()->create()->can('delete', $reservation));
+        $this->assertTrue(auth()->user()->can('delete', $reservation));
     }
 
     public function test_list_filters_by_status_and_table(): void

@@ -191,7 +191,11 @@ prefisso esplicito (8–15 cifre). Il numero originale resta in `phone`. Non c'�
   e ricalcola `ends_at`/`occupied_until` con la configurazione attuale del tavolo.
 - Il campo tavolo vuoto in modifica richiede una nuova assegnazione automatica.
 - Le prenotazioni annullate restano modificabili solo nei dati cliente.
-- Le prenotazioni non si eliminano mai: si annullano.
+- Due modi per togliere una prenotazione:
+  - **Annulla**: resta nello storico con stato `cancelled`;
+  - **Elimina definitivamente** (singola o di massa, solo admin, con conferma): cancella il record
+    dal database in modo irreversibile, passando da `ReservationService::delete` sotto `BookingLock`.
+- In entrambi i casi il tavolo torna libero. Un tavolo senza più prenotazioni può essere eliminato.
 
 ## Sicurezza del pannello
 
