@@ -7,17 +7,18 @@
  * - API calls, Livewire requests and every non-GET request are never cached.
  *
  * Bump CACHE_VERSION when the offline page or the precached files change.
+ * Icons live in /pwa/ and not /icons/: Apache reserves /icons/ with a default alias.
  */
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `antico-burger-admin-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_URLS = [
     OFFLINE_URL,
-    '/icons/icon-192.png',
+    '/pwa/icon-192.png',
     '/images/logo-anticoburger-dark.png',
     '/images/logo-anticoburger-white.png',
 ];
-const STATIC_PATH_PREFIXES = ['/css/', '/js/', '/fonts/', '/icons/', '/images/'];
+const STATIC_PATH_PREFIXES = ['/css/', '/js/', '/fonts/', '/pwa/', '/images/'];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(

@@ -46,6 +46,7 @@ class PwaTest extends TestCase
         $sizes = [];
 
         foreach ($manifest['icons'] as $icon) {
+            $this->assertStringStartsNotWith('/icons/', $icon['src'], 'Apache reserves /icons/ with a default alias');
             $path = public_path(ltrim($icon['src'], '/'));
             $this->assertFileExists($path);
 
@@ -58,7 +59,9 @@ class PwaTest extends TestCase
         $this->assertContains('512x512-any', $sizes);
         $this->assertContains('512x512-maskable', $sizes);
 
-        foreach (['sw.js', 'offline.html', 'favicon.ico', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'] as $file) {
+        $this->assertDirectoryDoesNotExist(public_path('icons'));
+
+        foreach (['sw.js', 'offline.html', 'favicon.ico', 'apple-touch-icon.png', 'pwa/favicon-32.png'] as $file) {
             $this->assertFileExists(public_path($file));
         }
     }
