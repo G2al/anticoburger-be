@@ -9,6 +9,8 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,6 +28,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Antico Burger')
+            ->brandLogo(asset('images/logo-anticoburger-dark.png'))
+            ->darkModeBrandLogo(asset('images/logo-anticoburger-white.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('favicon.ico'))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.pwa-head'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.pwa-scripts'))
             ->colors([
                 'primary' => Color::Amber,
             ])

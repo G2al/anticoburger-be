@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#18181b">
+    <title>Offline – Antico Burger</title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #ffffff;
+            --fg: #18181b;
+            --muted: #71717a;
+            --button-bg: #18181b;
+            --button-fg: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #18181b;
+                --fg: #fafafa;
+                --muted: #a1a1aa;
+                --button-bg: #fafafa;
+                --button-fg: #18181b;
+            }
+
+            .logo-light { display: none; }
+            .logo-dark { display: block; }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            display: grid;
+            place-items: center;
+            padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+            background: var(--bg);
+            color: var(--fg);
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+        }
+
+        main { max-width: 360px; }
+
+        img { width: 220px; height: auto; margin: 0 auto 32px; }
+
+        .logo-dark { display: none; }
+
+        h1 { font-size: 1.25rem; margin: 0 0 8px; }
+
+        p { color: var(--muted); line-height: 1.5; margin: 0 0 24px; }
+
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            min-height: 44px;
+            font: inherit;
+            font-weight: 600;
+            background: var(--button-bg);
+            color: var(--button-fg);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <img class="logo-light" src="/images/logo-anticoburger-dark.png" alt="Antico Burger">
+        <img class="logo-dark" src="/images/logo-anticoburger-white.png" alt="Antico Burger">
+        <h1>Sei offline</h1>
+        <p>Il gestionale ha bisogno della connessione per mostrare prenotazioni e disponibilità aggiornate. Controlla la rete e riprova.</p>
+        <button type="button" onclick="location.reload()">Riprova</button>
+    </main>
+</body>
+</html>
