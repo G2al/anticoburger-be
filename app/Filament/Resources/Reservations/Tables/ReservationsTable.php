@@ -28,7 +28,7 @@ class ReservationsTable
         $timezone = BookingTime::timezone();
 
         return $table
-            ->defaultSort('starts_at', 'desc')
+            ->defaultSort('starts_at')
             ->columns([
                 TextColumn::make('public_reference')
                     ->label('Riferimento')
@@ -83,7 +83,8 @@ class ReservationsTable
                     ->indicateUsing(fn (array $data) => self::dateIndicator($data['from'] ?? null, $data['until'] ?? null)),
                 SelectFilter::make('status')
                     ->label('Stato')
-                    ->options(ReservationStatus::class),
+                    ->options(ReservationStatus::class)
+                    ->default(ReservationStatus::Confirmed->value),
                 SelectFilter::make('restaurant_table_id')
                     ->label('Tavolo')
                     ->relationship('restaurantTable', 'name'),

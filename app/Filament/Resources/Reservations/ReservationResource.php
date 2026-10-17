@@ -9,6 +9,7 @@ use App\Filament\Resources\Reservations\Pages\ViewReservation;
 use App\Filament\Resources\Reservations\Schemas\ReservationForm;
 use App\Filament\Resources\Reservations\Schemas\ReservationInfolist;
 use App\Filament\Resources\Reservations\Tables\ReservationsTable;
+use App\Filament\Resources\Reservations\Widgets\ReservationsOverview;
 use App\Models\Reservation;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -51,6 +52,13 @@ class ReservationResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with('restaurantTable');
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            ReservationsOverview::class,
+        ];
     }
 
     public static function getPages(): array

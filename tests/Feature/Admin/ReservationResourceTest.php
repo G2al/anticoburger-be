@@ -235,6 +235,7 @@ class ReservationResourceTest extends TestCase
         $kept = Reservation::factory()->on($table, self::THURSDAY, '20:00')->create();
 
         Livewire::test(ListReservations::class)
+            ->removeTableFilter('status')
             ->selectTableRecords([$first, $second])
             ->callAction(TestAction::make('delete')->table()->bulk());
 
@@ -260,22 +261,26 @@ class ReservationResourceTest extends TestCase
         $cancelled = Reservation::factory()->on($tableTwo, self::THURSDAY, '20:00')->cancelled()->create();
 
         Livewire::test(ListReservations::class)
+            ->removeTableFilter('status')
             ->assertCanSeeTableRecords([$confirmed, $cancelled])
             ->filterTable('status', ReservationStatus::Cancelled->value)
             ->assertCanSeeTableRecords([$cancelled])
             ->assertCanNotSeeTableRecords([$confirmed]);
 
         Livewire::test(ListReservations::class)
+            ->removeTableFilter('status')
             ->filterTable('restaurant_table_id', $tableOne->id)
             ->assertCanSeeTableRecords([$confirmed])
             ->assertCanNotSeeTableRecords([$cancelled]);
 
         Livewire::test(ListReservations::class)
+            ->removeTableFilter('status')
             ->filterTable('date', ['from' => self::THURSDAY, 'until' => self::THURSDAY])
             ->assertCanSeeTableRecords([$cancelled])
             ->assertCanNotSeeTableRecords([$confirmed]);
 
         Livewire::test(ListReservations::class)
+            ->removeTableFilter('status')
             ->searchTable('+39')
             ->assertCanSeeTableRecords([$confirmed, $cancelled]);
     }
