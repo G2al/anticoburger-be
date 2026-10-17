@@ -67,8 +67,9 @@ online confermata**. Le prenotazioni inserite dal pannello non generano notifich
 2. Copia le tre righe stampate nel `.env` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`),
    poi esegui `php artisan optimize`. Non cambiare più le chiavi: chiavi nuove invalidano tutti i
    dispositivi registrati.
-3. Apri la dashboard del pannello da ogni dispositivo e premi **Attiva notifiche** nel riquadro
-   "Notifiche push". Poi usa **Invia notifica di prova**.
+3. Da ogni dispositivo tocca l'icona **campanella** nell'header del pannello, accanto all'avatar.
+   Campanella barrata significa disattivate; campanella piena significa attive. All'attivazione
+   arriva subito una notifica di prova. Un nuovo tocco disattiva le notifiche su quel dispositivo.
 
 Requisiti e limiti:
 - HTTPS obbligatorio. Estensioni PHP `openssl`, `curl`, `mbstring` (`gmp` consigliata).

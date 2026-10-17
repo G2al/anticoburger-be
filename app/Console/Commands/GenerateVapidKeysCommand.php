@@ -14,11 +14,20 @@ class GenerateVapidKeysCommand extends Command
 
     public function handle(): int
     {
+        if (! class_exists(VAPID::class)) {
+            $this->error('Libreria Web Push non installata: esegui "composer install --no-dev --optimize-autoloader".');
+
+            return self::FAILURE;
+        }
+
         try {
             $keys = VAPID::createVapidKeys();
         } catch (Throwable $exception) {
             $this->error('Impossibile generare le chiavi: '.$exception->getMessage());
-            $this->line('Su Windows imposta la variabile OPENSSL_CONF verso un file openssl.cnf prima di avviare PHP.');
+
+            if (PHP_OS_FAMILY === 'Windows') {
+                $this->line('Su Windows imposta la variabile OPENSSL_CONF verso un file openssl.cnf prima di avviare PHP.');
+            }
 
             return self::FAILURE;
         }

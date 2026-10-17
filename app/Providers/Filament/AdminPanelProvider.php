@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.pwa-head'))
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.pwa-scripts'))
+            ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn (): View => view('filament.push-toggle'))
             ->colors([
                 'primary' => Color::Amber,
             ])

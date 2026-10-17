@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Events\PublicReservationCreated;
-use App\Filament\Widgets\PushNotificationsWidget;
 use App\Models\PushSubscription;
 use App\Models\Reservation;
 use App\Models\User;
@@ -18,7 +17,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Livewire\Livewire;
 use Minishlink\WebPush\MessageSentReport;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\VAPID;
@@ -259,16 +257,24 @@ class PushNotificationsTest extends TestCase
         $this->assertSame('Notifiche attive', $sent[0]['payload']['title']);
     }
 
-    public function test_dashboard_shows_the_push_widget_to_admins(): void
+    public function test_header_shows_the_notification_bell_next_to_the_user_menu(): void
     {
         $this->actingAs(User::factory()->admin()->create());
 
-        Livewire::test(PushNotificationsWidget::class)
+        $html = $this->get('/admin')
             ->assertOk()
-            ->assertSee('Notifiche push')
-            ->assertSee('Attiva notifiche');
+            ->assertSee('anticoBurgerPush', escape: false)
+            ->assertSee('test-public-key')
+            ->assertSee('Notifiche attive: tocca per disattivarle')
+            ->assertSee('Notifiche disattivate: tocca per attivarle')
+            ->assertDontSee('Invia notifica di prova')
+            ->getContent();
 
-        $this->get('/admin')->assertOk()->assertSee('anticoBurgerPush', escape: false)->assertSee('test-public-key');
+        $this->assertLessThan(
+            strpos($html, 'fi-user-menu'),
+            strpos($html, 'Notifiche disattivate: tocca per attivarle'),
+            'The bell must be rendered right before the user menu',
+        );
     }
 
     public function test_the_container_builds_the_real_web_push_client_from_the_configuration(): void

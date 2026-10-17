@@ -209,7 +209,8 @@ prefisso esplicito (8â€“15 cifre). Il numero originale resta in `phone`. Non c'Ã
   - il listener `NotifyAdminsOfNewReservation` invia, dopo la risposta HTTP, tramite
     `AdminPushNotifier`. Il notifier non solleva mai eccezioni, elimina le sottoscrizioni scadute
     (404/410) e nei log riporta solo l'host del servizio push;
-  - il widget `PushNotificationsWidget` in dashboard attiva, disattiva e prova le notifiche.
+  - la campanella nell'header (`resources/views/filament/push-toggle.blade.php`, render hook
+    `USER_MENU_BEFORE`) attiva o disattiva le notifiche e, all'attivazione, invia una notifica di prova.
 
 ## Sicurezza del pannello
 
