@@ -197,6 +197,20 @@ prefisso esplicito (8–15 cifre). Il numero originale resta in `phone`. Non c'�
     dal database in modo irreversibile, passando da `ReservationService::delete` sotto `BookingLock`.
 - In entrambi i casi il tavolo torna libero. Un tavolo senza più prenotazioni può essere eliminato.
 
+## PWA del pannello e notifiche push
+
+- `public/manifest.webmanifest`, `public/sw.js` e `public/offline.html` rendono il pannello
+  installabile. Le icone stanno in `public/pwa/`: il percorso `/icons/` è riservato da Apache.
+- Il service worker mette in cache solo asset statici. Pagine, API e Livewire passano sempre dalla rete.
+- Web Push (`minishlink/web-push`, VAPID):
+  - `PushSubscriptionController` salva o rimuove la sottoscrizione del dispositivo corrente
+    (route web autenticate, solo admin, gate `receive-push-notifications`);
+  - `ReservationService::createPublic` emette `PublicReservationCreated` dopo il commit;
+  - il listener `NotifyAdminsOfNewReservation` invia, dopo la risposta HTTP, tramite
+    `AdminPushNotifier`. Il notifier non solleva mai eccezioni, elimina le sottoscrizioni scadute
+    (404/410) e nei log riporta solo l'host del servizio push;
+  - il widget `PushNotificationsWidget` in dashboard attiva, disattiva e prova le notifiche.
+
 ## Sicurezza del pannello
 
 - `User` implementa `FilamentUser`; `canAccessPanel()` richiede `is_admin = true`.

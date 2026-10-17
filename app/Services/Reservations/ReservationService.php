@@ -5,6 +5,7 @@ namespace App\Services\Reservations;
 use App\Enums\BookingError;
 use App\Enums\ReservationChannel;
 use App\Enums\ReservationStatus;
+use App\Events\PublicReservationCreated;
 use App\Exceptions\BookingException;
 use App\Models\BookingSettings;
 use App\Models\Reservation;
@@ -41,7 +42,7 @@ class ReservationService
         $startsAt = $this->startsAtFrom($data);
         $partySize = (int) $data['party_size'];
 
-        return $this->bookingLock->run(function (BookingSettings $settings) use ($customer, $startsAt, $partySize) {
+        $issued = $this->bookingLock->run(function (BookingSettings $settings) use ($customer, $startsAt, $partySize) {
             $this->availability->ensureStartIsPubliclyBookable($startsAt, $settings);
             $this->ensurePartySizeIsBookable($partySize);
             $this->ensureNotDuplicate($customer['phone_normalized'], $startsAt, $partySize, $settings);
@@ -62,6 +63,10 @@ class ReservationService
 
             return new IssuedReservation($reservation, $cancellationToken);
         });
+
+        PublicReservationCreated::dispatch($issued->reservation);
+
+        return $issued;
     }
 
     /**

@@ -2,12 +2,16 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Services\Reservations\PhoneNumberNormalizer;
+use GuzzleHttp\Client;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Minishlink\WebPush\WebPush;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,7 +20,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(WebPush::class, fn () => new WebPush(
+            ['VAPID' => [
+                'subject' => config('push.vapid.subject'),
+                'publicKey' => config('push.vapid.public_key'),
+                'privateKey' => config('push.vapid.private_key'),
+            ]],
+            ['TTL' => config('push.ttl'), 'urgency' => 'high'],
+            new Client(['timeout' => config('push.timeout'), 'connect_timeout' => config('push.timeout')]),
+        ));
     }
 
     /**
@@ -26,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureTrustedProxies();
         $this->configureApiRateLimits();
+
+        Gate::define('receive-push-notifications', fn (User $user) => $user->isAdmin());
     }
 
     private function configureTrustedProxies(): void

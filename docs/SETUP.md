@@ -55,6 +55,30 @@ php artisan app:grant-admin email@esempio.it --revoke
 Nota: in questo ambiente l'utente `admin@anticoburger.it` è già stato autorizzato con il comando sopra.
 Per creare un nuovo utente da console: `php artisan make:filament-user`, poi `app:grant-admin`.
 
+## Notifiche push del gestionale (Web Push + VAPID)
+
+Gli amministratori possono ricevere una notifica su telefono o PC per ogni **nuova prenotazione
+online confermata**. Le prenotazioni inserite dal pannello non generano notifiche.
+
+1. Genera le chiavi **una sola volta**:
+   ```bash
+   php artisan app:vapid-keys
+   ```
+2. Copia le tre righe stampate nel `.env` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`),
+   poi esegui `php artisan optimize`. Non cambiare più le chiavi: chiavi nuove invalidano tutti i
+   dispositivi registrati.
+3. Apri la dashboard del pannello da ogni dispositivo e premi **Attiva notifiche** nel riquadro
+   "Notifiche push". Poi usa **Invia notifica di prova**.
+
+Requisiti e limiti:
+- HTTPS obbligatorio. Estensioni PHP `openssl`, `curl`, `mbstring` (`gmp` consigliata).
+- iPhone/iPad: iOS 16.4 o successivo, **solo dall'app installata** sulla schermata Home.
+- Android/desktop: Chrome, Edge e Firefox, anche senza installazione. Non in navigazione privata.
+- L'invio avviene dopo la risposta al cliente. Gli errori dei servizi push vengono registrati nel
+  log e non bloccano mai la prenotazione. I dispositivi disinstallati vengono rimossi in automatico.
+- Su Windows/XAMPP la generazione delle chiavi e la cifratura richiedono la variabile `OPENSSL_CONF`
+  (es. `C:\xampp\php\extras\ssl\openssl.cnf`) impostata **prima** di avviare PHP. Su Linux non serve.
+
 ## CORS
 
 In `.env`, origin separati da virgola:
