@@ -101,6 +101,10 @@ class ConcurrentBookingTest extends TestCase
                     'DB_PASSWORD' => (string) $connection['password'],
                     'CACHE_STORE' => 'array',
                     'SESSION_DRIVER' => 'array',
+                    'WAHA_URL' => '',
+                    'WAHA_API_KEY' => '',
+                    'VAPID_PUBLIC_KEY' => '',
+                    'VAPID_PRIVATE_KEY' => '',
                 ],
                 timeout: 60,
             );

@@ -64,7 +64,7 @@ class ReservationService
             return new IssuedReservation($reservation, $cancellationToken);
         });
 
-        PublicReservationCreated::dispatch($issued->reservation);
+        PublicReservationCreated::dispatch($issued->reservation, $issued->cancellationToken);
 
         return $issued;
     }

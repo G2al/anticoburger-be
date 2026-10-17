@@ -35,5 +35,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="WAHA_URL" value=""/>
+        <env name="WAHA_API_KEY" value=""/>
+        <env name="VAPID_PUBLIC_KEY" value=""/>
+        <env name="VAPID_PRIVATE_KEY" value=""/>
     </php>
 </phpunit>

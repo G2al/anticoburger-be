@@ -17,6 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Customer PWA
+    |--------------------------------------------------------------------------
+    |
+    | Base URL of the customer booking app, used to build the personal
+    | reservation management link sent to customers.
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'https://app.anticoburger.it'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Largest party size that can be configured on a table or requested
     |--------------------------------------------------------------------------
     */

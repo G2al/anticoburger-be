@@ -80,6 +80,27 @@ Requisiti e limiti:
 - Su Windows/XAMPP la generazione delle chiavi e la cifratura richiedono la variabile `OPENSSL_CONF`
   (es. `C:\xampp\php\extras\ssl\openssl.cnf`) impostata **prima** di avviare PHP. Su Linux non serve.
 
+## Conferma WhatsApp ai clienti (WAHA)
+
+A ogni prenotazione online confermata il cliente riceve su WhatsApp un messaggio di conferma con data,
+ora, persone e il **link personale** per vedere o annullare la prenotazione
+(`FRONTEND_URL/prenotazione#ref=…&token=…`). Le prenotazioni inserite dal pannello non ricevono
+messaggi.
+
+```dotenv
+WAHA_URL=http://127.0.0.1:3000   # come il server Laravel raggiunge WAHA
+WAHA_API_KEY=...                 # chiave API in chiaro, solo nel .env
+WAHA_SESSION=anticoburger        # sessione WAHA collegata al numero di Antico Burger
+FRONTEND_URL=https://app.anticoburger.it
+```
+
+- Senza `WAHA_URL` o `WAHA_API_KEY` l'invio è disattivato.
+- Prima dell'invio si verifica che il numero abbia WhatsApp: i fissi vengono saltati.
+- L'invio avviene dopo la risposta al cliente. Un errore di WAHA non blocca mai la prenotazione e
+  viene registrato nel log solo con l'id della prenotazione, mai con telefono o token.
+- I test non contattano mai WAHA: `phpunit.xml` lo disattiva e `Http::preventStrayRequests()` blocca
+  qualsiasi chiamata HTTP non simulata.
+
 ## CORS
 
 In `.env`, origin separati da virgola:
