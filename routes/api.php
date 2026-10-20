@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AvailabilityController;
+use App\Http\Controllers\Api\V1\BookingHoursController;
 use App\Http\Controllers\Api\V1\BookingSettingsController;
 use App\Http\Controllers\Api\V1\CalendarController;
 use App\Http\Controllers\Api\V1\MenuController;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::middleware('throttle:booking-read')->group(function () {
         Route::get('booking-settings', BookingSettingsController::class)->name('booking-settings');
+        Route::get('booking-hours', BookingHoursController::class)->name('booking-hours');
         Route::get('availability', AvailabilityController::class)->name('availability');
         Route::get('calendar', CalendarController::class)->name('calendar');
         Route::get('menu', MenuController::class)->name('menu');
