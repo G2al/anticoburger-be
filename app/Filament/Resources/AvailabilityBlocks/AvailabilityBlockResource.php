@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AvailabilityBlocks;
 
+use App\Filament\NavigationGroup;
 use App\Filament\Resources\AvailabilityBlocks\Pages\CreateAvailabilityBlock;
 use App\Filament\Resources\AvailabilityBlocks\Pages\EditAvailabilityBlock;
 use App\Filament\Resources\AvailabilityBlocks\Pages\ListAvailabilityBlocks;
@@ -18,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class AvailabilityBlockResource extends Resource
 {
@@ -31,7 +33,9 @@ class AvailabilityBlockResource extends Resource
 
     protected static ?string $navigationLabel = 'Blocchi disponibilità';
 
-    protected static ?int $navigationSort = 3;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::RESERVATIONS;
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'blocchi-disponibilita';
 

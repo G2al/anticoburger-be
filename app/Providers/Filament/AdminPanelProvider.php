@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -28,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Antico Burger')
+            ->navigationGroups(NavigationGroup::ALL)
             ->brandLogo(asset('images/logo-anticoburger-dark.png'))
             ->darkModeBrandLogo(asset('images/logo-anticoburger-white.png'))
             ->brandLogoHeight('2.5rem')

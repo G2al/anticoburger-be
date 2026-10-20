@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\NavigationGroup;
 use App\Filament\Support\BookingFeedback;
 use App\Models\BookingSettings;
 use App\Services\Reservations\BookingSettingsService;
@@ -17,6 +18,7 @@ use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use UnitEnum;
 
 /**
  * Edits the booking_settings singleton row. There is no way to create further rows.
@@ -27,13 +29,15 @@ class BookingSettingsPage extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected static ?string $navigationLabel = 'Impostazioni prenotazioni';
+    protected static ?string $navigationLabel = 'Impostazioni';
+
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::RESERVATIONS;
 
     protected static ?string $title = 'Impostazioni prenotazioni';
 
     protected static ?string $slug = 'impostazioni-prenotazioni';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reservations;
 
+use App\Filament\NavigationGroup;
 use App\Filament\Resources\Reservations\Pages\CreateReservation;
 use App\Filament\Resources\Reservations\Pages\EditReservation;
 use App\Filament\Resources\Reservations\Pages\ListReservations;
@@ -17,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class ReservationResource extends Resource
 {
@@ -29,6 +31,8 @@ class ReservationResource extends Resource
     protected static ?string $pluralModelLabel = 'prenotazioni';
 
     protected static ?string $navigationLabel = 'Prenotazioni';
+
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroup::RESERVATIONS;
 
     protected static ?int $navigationSort = 1;
 

@@ -78,6 +78,19 @@ class PanelAccessTest extends TestCase
         $this->assertFalse((new User(['name' => 'x', 'email' => 'x@example.com', 'password' => 'secret', 'is_admin' => true]))->isAdmin());
     }
 
+    public function test_sidebar_is_organized_in_groups(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->get('/admin')
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Dashboard',
+                'Prenotazioni', 'Prenotazioni', 'Blocchi disponibilità', 'Impostazioni',
+                'Sala', 'Tavoli',
+                'Menu', 'Prodotti', 'Categorie',
+            ]);
+    }
+
     public function test_public_registration_is_not_available(): void
     {
         $this->get('/admin/register')->assertNotFound();

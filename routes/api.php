@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AvailabilityController;
 use App\Http\Controllers\Api\V1\BookingSettingsController;
 use App\Http\Controllers\Api\V1\CalendarController;
+use App\Http\Controllers\Api\V1\MenuController;
 use App\Http\Controllers\Api\V1\ReservationController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('booking-settings', BookingSettingsController::class)->name('booking-settings');
         Route::get('availability', AvailabilityController::class)->name('availability');
         Route::get('calendar', CalendarController::class)->name('calendar');
+        Route::get('menu', MenuController::class)->name('menu');
     });
 
     Route::post('reservations', [ReservationController::class, 'store'])
