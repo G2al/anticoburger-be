@@ -107,7 +107,11 @@ class MenuItemResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('name')
+            ->reorderable('sort_order', fn ($livewire) => str_starts_with((string) ($livewire->activeTab ?? ''), 'categoria-'))
+            ->defaultSort('sort_order')
+            ->description(fn ($livewire) => str_starts_with((string) ($livewire->activeTab ?? ''), 'categoria-')
+                ? 'Usa il pulsante di riordino per trascinare i prodotti nell\'ordine in cui compaiono nel menu.'
+                : 'Apri la scheda di una categoria per riordinarne i prodotti.')
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Foto')

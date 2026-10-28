@@ -133,6 +133,34 @@ class MenuResourcesTest extends TestCase
         $this->assertSame([$item->image_path], array_values((array) $formPhoto));
     }
 
+    public function test_products_are_reorderable_inside_a_category_tab_only(): void
+    {
+        $burgers = $this->category('Panini');
+        $first = $this->item($burgers, ['name' => 'Zeta Burger']);
+        $second = $this->item($burgers, ['name' => 'Alfa Burger']);
+        $third = $this->item($burgers, ['name' => 'Mezzo Burger']);
+
+        $this->assertSame([1, 2, 3], [$first->sort_order, $second->sort_order, $third->sort_order]);
+
+        Livewire::test(ListMenuItems::class)
+            ->set('activeTab', 'categoria-'.$burgers->id)
+            ->assertCanSeeTableRecords([$first, $second, $third], inOrder: true)
+            ->call('reorderTable', [(string) $third->id, (string) $first->id, (string) $second->id]);
+
+        $this->assertSame(
+            ['Mezzo Burger', 'Zeta Burger', 'Alfa Burger'],
+            MenuItem::query()->orderBy('sort_order')->pluck('name')->all(),
+        );
+
+        $this->getJson('/api/v1/menu')->assertJsonPath('data.0.items.0.name', 'Mezzo Burger');
+
+        Livewire::test(ListMenuItems::class)
+            ->assertSet('activeTab', 'tutti')
+            ->call('reorderTable', [(string) $second->id, (string) $third->id, (string) $first->id]);
+
+        $this->assertSame('Mezzo Burger', MenuItem::query()->orderBy('sort_order')->value('name'));
+    }
+
     public function test_product_validation(): void
     {
         Livewire::test(CreateMenuItem::class)

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string $price
  * @property string|null $ingredients
  * @property bool $is_special
+ * @property int $sort_order position inside the category
  */
 class MenuItem extends Model
 {
@@ -32,6 +33,7 @@ class MenuItem extends Model
         'price',
         'ingredients',
         'is_special',
+        'sort_order',
     ];
 
     protected $attributes = [
@@ -44,11 +46,19 @@ class MenuItem extends Model
             'menu_category_id' => 'integer',
             'price' => 'decimal:2',
             'is_special' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 
     protected static function booted(): void
     {
+        // New products go to the end of their category.
+        static::creating(function (MenuItem $item) {
+            if (! $item->sort_order) {
+                $item->sort_order = (int) self::query()->where('menu_category_id', $item->menu_category_id)->max('sort_order') + 1;
+            }
+        });
+
         static::saving(function (MenuItem $item) {
             if ($item->isDirty('image_path') && filled($item->image_path)) {
                 $item->image_path = app(MenuImageOptimizer::class)->optimize(self::IMAGE_DISK, $item->image_path);

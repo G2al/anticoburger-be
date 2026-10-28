@@ -13,13 +13,13 @@ class MenuController extends Controller
 
     /**
      * Public menu: categories in the admin order (only those with products),
-     * products alphabetically.
+     * products in the admin order within each category.
      */
     public function __invoke(): JsonResponse
     {
         $categories = MenuCategory::query()
             ->whereHas('items')
-            ->with(['items' => fn ($query) => $query->orderBy('name')])
+            ->with(['items' => fn ($query) => $query->orderBy('sort_order')->orderBy('name')])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();

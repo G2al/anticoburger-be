@@ -32,8 +32,8 @@ class MenuApiTest extends TestCase
                         'id' => $burgers->id,
                         'name' => 'Panini',
                         'items' => [
-                            ['id' => 2, 'name' => 'Classic Burger', 'price' => '12.00', 'ingredients' => null, 'is_special' => false, 'image_url' => null],
                             ['id' => 1, 'name' => 'Truffle Burger', 'price' => '16.50', 'ingredients' => 'Tartufo, manzo', 'is_special' => true, 'image_url' => Storage::disk(MenuItem::IMAGE_DISK)->url('menu/truffle.jpg')],
+                            ['id' => 2, 'name' => 'Classic Burger', 'price' => '12.00', 'ingredients' => null, 'is_special' => false, 'image_url' => null],
                         ],
                     ],
                     [

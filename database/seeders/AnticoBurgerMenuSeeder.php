@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
  * Current menu of Antico Burger: `php artisan db:seed --class=AnticoBurgerMenuSeeder --force`.
  *
  * Idempotent: categories are matched by name and products by category + name;
- * prices and ingredients are updated, photos and the "special" flag are never touched.
+ * prices, ingredients and the printed-menu order are reset, photos and the "special" flag are never touched.
  * An asterisk marks products frozen at origin, as on the printed menu.
  */
 class AnticoBurgerMenuSeeder extends Seeder
@@ -100,10 +100,10 @@ class AnticoBurgerMenuSeeder extends Seeder
         foreach (self::MENU as $categoryName => $items) {
             $category = MenuCategory::query()->updateOrCreate(['name' => $categoryName], ['sort_order' => ++$sortOrder]);
 
-            foreach ($items as [$name, $price, $ingredients]) {
+            foreach ($items as $position => [$name, $price, $ingredients]) {
                 MenuItem::query()->updateOrCreate(
                     ['menu_category_id' => $category->id, 'name' => $name],
-                    ['price' => $price, 'ingredients' => $ingredients],
+                    ['price' => $price, 'ingredients' => $ingredients, 'sort_order' => $position + 1],
                 );
             }
         }
