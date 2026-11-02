@@ -65,7 +65,8 @@ Stato di ogni giorno del mese per il numero di persone indicato (un mese per ric
     "days": [
       { "date": "2026-10-15", "status": "not_bookable" },
       { "date": "2026-10-16", "status": "available" },
-      { "date": "2026-10-21", "status": "closed" },
+      { "date": "2026-10-21", "status": "closed", "message": null },
+      { "date": "2026-10-26", "status": "closed", "message": "Chiusura per ferie, ci scusiamo!" },
       { "date": "2026-10-23", "status": "fully_booked" }
     ]
   }

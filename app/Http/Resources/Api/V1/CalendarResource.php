@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property array{month: string, party_size: int, days: array<string, CalendarDayStatus>} $resource
+ * "message" is the title of the whole-restaurant block that closes the day, only for
+ * closed days; null otherwise (e.g. weekly closing day).
+ *
+ * @property array{month: string, party_size: int, days: array<string, CalendarDayStatus>, messages: array<string, string>} $resource
  */
 class CalendarResource extends JsonResource
 {
@@ -19,7 +22,11 @@ class CalendarResource extends JsonResource
         $days = [];
 
         foreach ($this->resource['days'] as $date => $status) {
-            $days[] = ['date' => $date, 'status' => $status->value];
+            $days[] = [
+                'date' => $date,
+                'status' => $status->value,
+                'message' => $status === CalendarDayStatus::Closed ? ($this->resource['messages'][$date] ?? null) : null,
+            ];
         }
 
         return [

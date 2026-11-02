@@ -150,6 +150,39 @@ class AvailabilityService
     }
 
     /**
+     * Titles of the active whole-restaurant blocks, by local date of the month, shown to
+     * customers as the reason of a closure. When several blocks cover a day the earliest wins.
+     *
+     * @return array<string, string> keyed by local "Y-m-d"
+     */
+    public function closureMessagesFor(CarbonImmutable $firstDayOfMonth): array
+    {
+        $firstDay = $firstDayOfMonth->startOfMonth();
+        $lastDay = $firstDay->endOfMonth()->startOfDay();
+
+        $blocks = AvailabilityBlock::query()
+            ->active()
+            ->where('scope', BlockScope::Restaurant)
+            ->coveringDates($firstDay, $lastDay)
+            ->orderBy('starts_on')
+            ->orderBy('id')
+            ->get(['title', 'starts_on', 'ends_on']);
+
+        $messages = [];
+
+        foreach ($blocks as $block) {
+            $from = max($block->starts_on->toDateString(), $firstDay->toDateString());
+            $until = min($block->ends_on->toDateString(), $lastDay->toDateString());
+
+            for ($date = $from; $date <= $until; $date = BookingTime::date($date)->addDay()->toDateString()) {
+                $messages[$date] ??= $block->title;
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
      * @throws BookingException
      */
     public function ensureDateIsPubliclyBookable(CarbonImmutable $localDate, BookingSettings $settings): void

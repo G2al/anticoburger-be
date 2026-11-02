@@ -63,6 +63,24 @@ class CalendarApiTest extends TestCase
         $this->assertSame('closed', $calendar['2026-10-18']);
     }
 
+    public function test_closed_days_carry_the_title_of_the_restaurant_block(): void
+    {
+        $table = $this->createTable([2], ['slot_interval_minutes' => 60], '19:00', '21:00', days: [1, 2, 4, 5, 6, 7]);
+        AvailabilityBlock::factory()->between('2026-10-16', '2026-10-17')->create(['title' => 'Chiusura per ferie, ci scusiamo!']);
+        AvailabilityBlock::factory()->forTable($table)->between('2026-10-19')->create(['title' => 'Tavolo in manutenzione']);
+        AvailabilityBlock::factory()->between('2026-10-20')->timeRange('19:00', '20:00')->create(['title' => 'Evento privato']);
+        AvailabilityBlock::factory()->between('2026-10-22')->inactive()->create(['title' => 'Blocco disattivato']);
+
+        $days = collect($this->getJson('/api/v1/calendar?month=2026-10&party_size=2')->assertOk()->json('data.days'))->keyBy('date');
+
+        $this->assertSame(['date' => '2026-10-16', 'status' => 'closed', 'message' => 'Chiusura per ferie, ci scusiamo!'], $days['2026-10-16']);
+        $this->assertSame('Chiusura per ferie, ci scusiamo!', $days['2026-10-17']['message']);
+        $this->assertSame(['closed', null], [$days['2026-10-14']['status'], $days['2026-10-14']['message']]);
+        $this->assertSame(['closed', null], [$days['2026-10-19']['status'], $days['2026-10-19']['message']]);
+        $this->assertSame(['available', null], [$days['2026-10-20']['status'], $days['2026-10-20']['message']]);
+        $this->assertSame(['available', null], [$days['2026-10-22']['status'], $days['2026-10-22']['message']]);
+    }
+
     public function test_today_is_not_bookable_when_every_start_is_within_the_lead_time(): void
     {
         $this->createTable([2], ['slot_interval_minutes' => 30], '08:00', '10:00');

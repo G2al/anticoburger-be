@@ -19,10 +19,13 @@ class CalendarController extends Controller
         $month = $request->validated('month');
         $partySize = (int) $request->validated('party_size');
 
+        $firstDayOfMonth = BookingTime::date($month.'-01');
+
         return new CalendarResource([
             'month' => $month,
             'party_size' => $partySize,
-            'days' => $availability->publicCalendarFor(BookingTime::date($month.'-01'), $partySize, BookingSettings::current()),
+            'days' => $availability->publicCalendarFor($firstDayOfMonth, $partySize, BookingSettings::current()),
+            'messages' => $availability->closureMessagesFor($firstDayOfMonth),
         ]);
     }
 }

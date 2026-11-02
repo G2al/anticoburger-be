@@ -115,7 +115,8 @@ export type CalendarDayStatus = "available" | "fully_booked" | "closed" | "not_b
 export type Calendar = {
   month: string;      // "YYYY-MM"
   party_size: number;
-  days: { date: string; status: CalendarDayStatus }[]; // tutti i giorni del mese, in ordine
+  days: { date: string; status: CalendarDayStatus; message: string | null }[]; // tutti i giorni del mese, in ordine
+  // message: solo per i giorni "closed" da una chiusura dell'intero ristorante (titolo scritto dall'admin), altrimenti null
 };
 
 export type Availability = {
@@ -198,7 +199,7 @@ oggi 16/10, mercoledì senza fasce, 23/10 pieno, ferie il 26–27/10):
  {"date":"2026-10-16","status":"available"},
  {"date":"2026-10-21","status":"closed"},
  {"date":"2026-10-23","status":"fully_booked"},
- {"date":"2026-10-26","status":"closed"},
+ {"date":"2026-10-26","status":"closed","message":"Chiusura per ferie, ci scusiamo!"},
  {"date":"2026-10-29","status":"available"}]}}
 ```
 
