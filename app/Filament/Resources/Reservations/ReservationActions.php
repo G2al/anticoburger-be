@@ -19,6 +19,41 @@ use Illuminate\Support\Collection;
  */
 final class ReservationActions
 {
+    /**
+     * Starts a phone call to the customer (tel: link, opens the dialer on phones).
+     */
+    public static function callCustomer(): Action
+    {
+        return Action::make('callCustomer')
+            ->label('Chiama cliente')
+            ->icon(Heroicon::OutlinedPhone)
+            ->color('success')
+            ->authorize('view')
+            ->url(fn (Reservation $record) => 'tel:'.$record->phone_normalized);
+    }
+
+    /**
+     * Opens WhatsApp (app on phones, WhatsApp Web on desktop) with the beginning of a
+     * message already written; the admin completes it before sending.
+     */
+    public static function whatsAppCustomer(): Action
+    {
+        return Action::make('whatsAppCustomer')
+            ->label('WhatsApp')
+            ->icon(Heroicon::OutlinedChatBubbleLeftEllipsis)
+            ->color('success')
+            ->authorize('view')
+            ->url(fn (Reservation $record) => self::whatsAppUrl($record))
+            ->openUrlInNewTab();
+    }
+
+    public static function whatsAppUrl(Reservation $reservation): string
+    {
+        $text = "Ciao {$reservation->fullName()}, ti contattiamo per avvisarti che ";
+
+        return 'https://wa.me/'.ltrim($reservation->phone_normalized, '+').'?text='.rawurlencode($text);
+    }
+
     public static function cancel(): Action
     {
         return Action::make('cancel')

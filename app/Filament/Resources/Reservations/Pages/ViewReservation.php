@@ -14,6 +14,8 @@ class ViewReservation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            ReservationActions::callCustomer(),
+            ReservationActions::whatsAppCustomer(),
             EditAction::make(),
             ReservationActions::moveToTable(),
             ReservationActions::cancel(),

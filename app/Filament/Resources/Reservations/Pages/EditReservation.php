@@ -22,6 +22,8 @@ class EditReservation extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            ReservationActions::callCustomer(),
+            ReservationActions::whatsAppCustomer(),
             ViewAction::make(),
             ReservationActions::moveToTable(),
             ReservationActions::cancel(),

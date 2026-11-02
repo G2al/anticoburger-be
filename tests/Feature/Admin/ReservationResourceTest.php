@@ -177,6 +177,25 @@ class ReservationResourceTest extends TestCase
         $this->assertSame('21:30', $reservation->localEndsAt()->format('H:i'));
     }
 
+    public function test_call_and_whatsapp_buttons_point_to_the_customer(): void
+    {
+        $table = $this->createTable([2]);
+        $reservation = Reservation::factory()->on($table, self::WEDNESDAY, '20:00')->create([
+            'first_name' => 'Mario',
+            'last_name' => 'Rossi',
+            'phone' => '333 123 4567',
+            'phone_normalized' => '+393331234567',
+        ]);
+
+        Livewire::test(ViewReservation::class, ['record' => $reservation->getRouteKey()])
+            ->assertActionHasUrl('callCustomer', 'tel:+393331234567')
+            ->assertActionHasUrl(
+                'whatsAppCustomer',
+                'https://wa.me/393331234567?text=Ciao%20Mario%20Rossi%2C%20ti%20contattiamo%20per%20avvisarti%20che%20',
+            )
+            ->assertActionShouldOpenUrlInNewTab('whatsAppCustomer');
+    }
+
     public function test_reservation_can_be_cancelled_from_the_admin(): void
     {
         $table = $this->createTable([2]);

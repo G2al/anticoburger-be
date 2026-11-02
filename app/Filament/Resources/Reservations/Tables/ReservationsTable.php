@@ -108,6 +108,8 @@ class ReservationsTable
                 ViewAction::make(),
                 EditAction::make(),
                 ActionGroup::make([
+                    ReservationActions::callCustomer(),
+                    ReservationActions::whatsAppCustomer(),
                     ReservationActions::moveToTable(),
                     ReservationActions::cancel(),
                     ReservationActions::delete(),
