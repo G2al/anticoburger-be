@@ -18,10 +18,12 @@ enum BookingError: string
     case ReservationTokenMissing = 'RESERVATION_TOKEN_MISSING';
     case ReservationNotFound = 'RESERVATION_NOT_FOUND';
     case MonthOutOfRange = 'MONTH_OUT_OF_RANGE';
+    case ReservationNotModifiable = 'RESERVATION_NOT_MODIFIABLE';
 
     public function message(): string
     {
         return match ($this) {
+            self::ReservationNotModifiable => 'La prenotazione è già iniziata o passata e non può più essere modificata.',
             self::MonthOutOfRange => 'Il mese selezionato non è consultabile.',
             self::ReservationTokenMissing => 'Per accedere alla prenotazione è necessario il codice segreto (header X-Reservation-Token).',
             self::ReservationNotFound => 'Prenotazione non trovata.',
@@ -45,7 +47,8 @@ enum BookingError: string
             self::DuplicateReservation,
             self::PhoneDailyLimitReached,
             self::TableNotAvailable,
-            self::ReservationCancelled => 409,
+            self::ReservationCancelled,
+            self::ReservationNotModifiable => 409,
             self::PartySizeNotSupported,
             self::BookingTooSoon,
             self::DateOutOfRange,

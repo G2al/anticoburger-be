@@ -23,6 +23,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     Route::middleware('throttle:booking-access')->group(function () {
         Route::get('reservations/{reference}', [ReservationController::class, 'show'])->name('reservations.show');
+        Route::post('reservations/{reference}/reschedule', [ReservationController::class, 'reschedule'])->name('reservations.reschedule');
         Route::post('reservations/{reference}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     });
 });

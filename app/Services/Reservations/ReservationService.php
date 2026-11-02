@@ -6,6 +6,7 @@ use App\Enums\BookingError;
 use App\Enums\ReservationChannel;
 use App\Enums\ReservationStatus;
 use App\Events\PublicReservationCreated;
+use App\Events\PublicReservationRescheduled;
 use App\Exceptions\BookingException;
 use App\Models\BookingSettings;
 use App\Models\Reservation;
@@ -128,6 +129,59 @@ class ReservationService
         }
 
         return $this->reschedule($reservation, $startsAt, $partySize, $requestedTableId, $customer);
+    }
+
+    /**
+     * The customer changes date, time and/or party size of an online reservation.
+     * The same public rules as a new booking apply (lead time, advance limit, duplicates,
+     * daily phone limit), ignoring the reservation itself. Atomic: if the new slot is not
+     * available the original reservation stays untouched. Only future, confirmed
+     * reservations can be changed; asking for the current values changes nothing.
+     *
+     * @param  array<string, mixed>  $data  date (Y-m-d), time (H:i), party_size
+     *
+     * @throws BookingException
+     */
+    public function reschedulePublic(Reservation $reservation, array $data, #[\SensitiveParameter] string $cancellationToken): Reservation
+    {
+        $startsAt = $this->startsAtFrom($data);
+        $partySize = (int) $data['party_size'];
+        $changed = false;
+
+        $reservation = $this->bookingLock->run(function (BookingSettings $settings) use ($reservation, $startsAt, $partySize, &$changed) {
+            $reservation->refresh();
+
+            if (! $reservation->isConfirmed()) {
+                throw BookingException::because(BookingError::ReservationCancelled);
+            }
+
+            if ($reservation->starts_at->lte(CarbonImmutable::now('UTC'))) {
+                throw BookingException::because(BookingError::ReservationNotModifiable);
+            }
+
+            if ($startsAt->equalTo($reservation->starts_at) && $partySize === $reservation->party_size) {
+                return $reservation;
+            }
+
+            $this->availability->ensureStartIsPubliclyBookable($startsAt, $settings);
+            $this->ensurePartySizeIsBookable($partySize);
+            $this->ensureNotDuplicate($reservation->phone_normalized, $startsAt, $partySize, $settings, $reservation);
+            $this->ensurePhoneDailyLimitNotReached($reservation->phone_normalized, $startsAt, $settings, $reservation);
+
+            $table = $this->availability->freeTablesAt($startsAt, $partySize, $reservation)->first()
+                ?? throw BookingException::because(BookingError::SlotNotAvailable);
+
+            $reservation->update($this->occupancyAttributes($table, $startsAt, $partySize));
+            $changed = true;
+
+            return $reservation;
+        });
+
+        if ($changed) {
+            PublicReservationRescheduled::dispatch($reservation, $cancellationToken);
+        }
+
+        return $reservation;
     }
 
     /**
@@ -257,7 +311,7 @@ class ReservationService
     /**
      * @throws BookingException
      */
-    private function ensureNotDuplicate(string $phoneNormalized, CarbonImmutable $startsAt, int $partySize, BookingSettings $settings): void
+    private function ensureNotDuplicate(string $phoneNormalized, CarbonImmutable $startsAt, int $partySize, BookingSettings $settings, ?Reservation $ignoring = null): void
     {
         if (! $settings->prevent_duplicate_bookings) {
             return;
@@ -268,6 +322,7 @@ class ReservationService
             ->where('phone_normalized', $phoneNormalized)
             ->where('starts_at', $startsAt->utc())
             ->where('party_size', $partySize)
+            ->when($ignoring, fn ($query) => $query->whereKeyNot($ignoring->getKey()))
             ->exists();
 
         if ($duplicateExists) {
@@ -280,7 +335,7 @@ class ReservationService
      *
      * @throws BookingException
      */
-    private function ensurePhoneDailyLimitNotReached(string $phoneNormalized, CarbonImmutable $startsAt, BookingSettings $settings): void
+    private function ensurePhoneDailyLimitNotReached(string $phoneNormalized, CarbonImmutable $startsAt, BookingSettings $settings, ?Reservation $ignoring = null): void
     {
         if ($settings->max_reservations_per_phone_per_day === 0) {
             return;
@@ -290,6 +345,7 @@ class ReservationService
             ->confirmed()
             ->where('phone_normalized', $phoneNormalized)
             ->startingOnLocalDate(BookingTime::toLocal($startsAt)->startOfDay())
+            ->when($ignoring, fn ($query) => $query->whereKeyNot($ignoring->getKey()))
             ->count();
 
         if ($reservationsThatDay >= $settings->max_reservations_per_phone_per_day) {

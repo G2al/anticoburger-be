@@ -153,6 +153,26 @@ Risposta 200 con lo stesso schema di creazione, senza `cancellation_token`.
 - Token errato o riferimento inesistente: `404 RESERVATION_NOT_FOUND`. La risposta è identica nei
   due casi e non rivela se la prenotazione esiste.
 
+### POST /reservations/{reference}/reschedule
+
+Header obbligatorio: `X-Reservation-Token: <token>`.
+Corpo: `{ "date": "YYYY-MM-DD", "time": "HH:mm", "party_size": N }`.
+
+Sposta la prenotazione su una nuova data, ora e/o numero di persone. Valgono le stesse regole di
+una nuova prenotazione online: anticipo minimo e massimo, capienze, fasce, blocchi, duplicati e
+limite per telefono. Duplicati e limite per telefono escludono la prenotazione stessa.
+L'operazione è atomica: se il nuovo orario non è libero, la prenotazione originale resta invariata.
+Il tavolo viene riassegnato automaticamente. Se i valori inviati sono uguali a quelli attuali non
+cambia nulla. Dopo una modifica effettiva il cliente riceve il WhatsApp "è stata modificata" e
+l'admin una notifica push. Riferimento e token restano gli stessi.
+
+- `200`: il `Reservation` aggiornato (senza `cancellation_token`).
+- Errori: `401 RESERVATION_TOKEN_MISSING`, `404 RESERVATION_NOT_FOUND`, `422 VALIDATION_FAILED`,
+  `422 DATE_OUT_OF_RANGE`, `422 BOOKING_TOO_SOON`, `422 PARTY_SIZE_NOT_SUPPORTED`,
+  `409 SLOT_NOT_AVAILABLE`, `409 DUPLICATE_RESERVATION`, `409 PHONE_DAILY_LIMIT_REACHED`,
+  `409 RESERVATION_CANCELLED` (già annullata), `409 RESERVATION_NOT_MODIFIABLE` (già iniziata o passata),
+  `429`.
+
 ### POST /reservations/{reference}/cancel
 
 Header obbligatorio: `X-Reservation-Token: <token>`. Nessun corpo.
@@ -185,6 +205,8 @@ La validazione aggiunge `fields`:
 | 422 | `VALIDATION_FAILED` | dati non validi (`fields` contiene i dettagli) |
 | 422 | `PARTY_SIZE_NOT_SUPPORTED` | nessun tavolo attivo accetta quel numero di persone |
 | 422 | `DATE_OUT_OF_RANGE` | data passata o oltre l'anticipo massimo |
+| 409 | `RESERVATION_CANCELLED` | modifica di una prenotazione annullata |
+| 409 | `RESERVATION_NOT_MODIFIABLE` | modifica di una prenotazione già iniziata o passata |
 | 422 | `MONTH_OUT_OF_RANGE` | mese del calendario precedente al corrente o troppo lontano |
 | 422 | `BOOKING_TOO_SOON` | orario passato o entro l'anticipo minimo |
 | 429 | `TOO_MANY_REQUESTS` | rate limit superato (vedi header `Retry-After`) |

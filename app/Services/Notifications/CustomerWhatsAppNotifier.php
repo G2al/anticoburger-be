@@ -20,7 +20,7 @@ class CustomerWhatsAppNotifier
     /**
      * @return bool true when the message was handed to WAHA
      */
-    public function sendReservationConfirmation(Reservation $reservation, string $cancellationToken): bool
+    public function sendReservationConfirmation(Reservation $reservation, #[\SensitiveParameter] string $cancellationToken, bool $rescheduled = false): bool
     {
         if (! $this->waha->isConfigured()) {
             return false;
@@ -35,7 +35,7 @@ class CustomerWhatsAppNotifier
                 return false;
             }
 
-            $this->waha->sendText($chatId, $this->confirmationText($reservation, $cancellationToken));
+            $this->waha->sendText($chatId, $this->confirmationText($reservation, $cancellationToken, $rescheduled));
 
             return true;
         } catch (Throwable $exception) {
@@ -49,18 +49,19 @@ class CustomerWhatsAppNotifier
         }
     }
 
-    public function confirmationText(Reservation $reservation, string $cancellationToken): string
+    public function confirmationText(Reservation $reservation, #[\SensitiveParameter] string $cancellationToken, bool $rescheduled = false): string
     {
         $startsAt = $reservation->localStartsAt()->locale('it');
         $people = $reservation->party_size === 1 ? '1 persona' : "{$reservation->party_size} persone";
+        $outcome = $rescheduled ? 'è stata modificata' : 'è confermata';
 
         return implode("\n", [
-            "Ciao {$reservation->first_name}, la tua prenotazione da *Antico Burger* è confermata ✅",
+            "Ciao {$reservation->first_name}, la tua prenotazione da *Antico Burger* {$outcome} ✅",
             '',
             '📅 '.ucfirst($startsAt->translatedFormat('l j F')).' alle '.$startsAt->format('H:i'),
             "👥 {$people}",
             '',
-            'Per vedere o annullare la prenotazione:',
+            'Per vedere, modificare o annullare la prenotazione:',
             $this->managementUrl($reservation, $cancellationToken),
             '',
             'A presto!',

@@ -37,6 +37,14 @@ class AdminPushNotifier
     /**
      * @return int number of devices that accepted the notification
      */
+    public function notifyRescheduledReservation(Reservation $reservation): int
+    {
+        return $this->send($this->adminSubscriptions(), $this->newReservationPayload($reservation, 'Prenotazione modificata'));
+    }
+
+    /**
+     * @return int number of devices that accepted the notification
+     */
     public function sendTest(User $user): int
     {
         return $this->send($user->pushSubscriptions()->get(), [
@@ -50,14 +58,14 @@ class AdminPushNotifier
     /**
      * @return array{title: string, body: string, url: string, tag: string}
      */
-    public function newReservationPayload(Reservation $reservation): array
+    public function newReservationPayload(Reservation $reservation, string $title = 'Nuova prenotazione'): array
     {
         $reservation->loadMissing('restaurantTable');
         $startsAt = $reservation->localStartsAt()->locale('it');
         $people = $reservation->party_size === 1 ? '1 persona' : "{$reservation->party_size} persone";
 
         return [
-            'title' => 'Nuova prenotazione',
+            'title' => $title,
             'body' => implode("\n", [
                 "{$reservation->fullName()} · {$people}",
                 ucfirst($startsAt->translatedFormat('l j F')).' alle '.$startsAt->format('H:i')

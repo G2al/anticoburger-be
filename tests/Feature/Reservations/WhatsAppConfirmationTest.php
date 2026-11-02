@@ -76,7 +76,7 @@ class WhatsAppConfirmationTest extends TestCase
                 '📅 Mercoledì 14 ottobre alle 20:00',
                 '👥 2 persone',
                 '',
-                'Per vedere o annullare la prenotazione:',
+                'Per vedere, modificare o annullare la prenotazione:',
                 "https://app.anticoburger.it/prenotazione#ref={$created['reference']}&token={$created['cancellation_token']}",
                 '',
                 'A presto!',

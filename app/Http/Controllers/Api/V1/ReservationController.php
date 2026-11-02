@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\RescheduleReservationRequest;
 use App\Http\Requests\Api\V1\StoreReservationRequest;
 use App\Http\Resources\Api\V1\ReservationResource;
 use App\Services\Reservations\ReservationService;
@@ -27,6 +28,14 @@ class ReservationController extends Controller
         return new ReservationResource(
             $this->reservations->findForCustomer($reference, $request->header(self::TOKEN_HEADER))
         );
+    }
+
+    public function reschedule(RescheduleReservationRequest $request, string $reference): ReservationResource
+    {
+        $token = $request->header(self::TOKEN_HEADER);
+        $reservation = $this->reservations->findForCustomer($reference, $token);
+
+        return new ReservationResource($this->reservations->reschedulePublic($reservation, $request->validated(), $token));
     }
 
     public function cancel(Request $request, string $reference): ReservationResource
